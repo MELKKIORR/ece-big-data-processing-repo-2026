@@ -9,7 +9,7 @@ config =  {
 admin_client = AdminClient(config)
 
 # %%
-topic='wikistreams'
+topic='wikistreams_filtered'
 admin_client.create_topics(
   [NewTopic(topic, num_partitions=1, replication_factor=1)]
 )
