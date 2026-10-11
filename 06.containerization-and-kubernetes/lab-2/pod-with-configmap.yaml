@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spark-app
+  namespace: lab-configmap-secret
+spec:
+  containers:
+  - name: app
+    image: busybox:1.37
+    command: ["sleep", "600"]
+    env:
+    # #1 ConfigMap key as env var
+    - name: LOG_LEVEL
+      valueFrom:
+        configMapKeyRef:
+          name: data-platform-config
+          key: log_level
+
+    # #2 ConfigMap key
+    - name: SPARK_WORKERS
+      valueFrom:
+        configMapKeyRef:
+          name: data-platform-config
+          key: spark_workers
+
+    # Inject all ConfigMap keys as env vars
+    envFrom:
+    - configMapRef:
+        name: data-platform-config

@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-transform-job
+  namespace: lab-job-cronjob
+spec:
+  backoffLimit: 3          # 1 initial attempt + 3 retries
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      containers:
+      - name: transform
+        image: python:3.13-slim
+        command: ["python", "-c"]
+        args:
+          - |
+            import sys
+            print("Transforming records...")
+            print("ERROR: Validation failed!")
+            sys.exit(1)
+      restartPolicy: Never

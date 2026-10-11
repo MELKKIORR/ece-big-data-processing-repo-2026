@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-export-job
+  namespace: lab-job-cronjob
+spec:
+  parallelism: 4            # Run 4 Pods in parallel
+  completions: 4            # Need 4 successful completions
+  completionMode: Indexed   # Completion index 0 to 3, one per Pod
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 600  # Delete the Job and its Pods 10 minutes after completion
+  template:
+    spec:
+      containers:
+      - name: export
+        image: python:3.13-slim
+        command: ["python", "-c"]
+        args:
+          - |
+            import os, time
+            pod = os.getenv('HOSTNAME', 'unknown')
+            shard = int(os.environ['JOB_COMPLETION_INDEX'])
+            print(f"Pod {pod}: Exporting shard {shard} (users with id % 4 == {shard})...")
+            time.sleep(5)
+            print(f"Pod {pod}: Shard {shard} export completed!")
+      restartPolicy: Never

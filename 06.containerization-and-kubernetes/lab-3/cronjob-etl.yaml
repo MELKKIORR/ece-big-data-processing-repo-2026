@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etl-bronze-to-silver
+  namespace: lab-job-cronjob
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          containers:
+          - name: etl
+            image: python:3.13-slim
+            envFrom:
+            - configMapRef:
+                name: etl-config
+            resources:
+              requests:
+                cpu: 100m
+                memory: 64Mi
+              limits:
+                memory: 128Mi
+            command: ["python", "-c"]
+            args:
+              - |
+                from datetime import datetime
+                import os
+                timestamp = datetime.now().isoformat()
+                source, target = os.environ['SOURCE_LAYER'], os.environ['TARGET_LAYER']
+                print(f"[{timestamp}] ETL: {source} -> {target}")
+                print(f"[{timestamp}] Batch size: {os.environ['BATCH_SIZE']}")
+                print(f"[{timestamp}] Reading, validating, deduplicating...")
+                print(f"[{timestamp}] Writing to {target} layer...")
+                print(f"[{timestamp}] Completed!")
+          restartPolicy: Never

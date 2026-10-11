@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: bronze-to-silver-pipeline
+  namespace: lab-job-cronjob
+spec:
+  schedule: "*/2 * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: transform
+            image: python:3.13-slim
+            command: ["python", "-c"]
+            args:
+              - |
+                from datetime import datetime
+                print(f"[{datetime.now()}] Bronze→Silver ETL started...")
+                import time; time.sleep(2)
+                print(f"[{datetime.now()}] Completed! 500 records processed")
+          restartPolicy: Never

@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-import-job
+  namespace: lab-job-cronjob
+spec:
+  template:
+    spec:
+      containers:
+      - name: import
+        image: python:3.13-slim
+        command: ["python", "-c"]
+        args:
+          - |
+            import time
+            print("Starting data import...")
+            time.sleep(3)
+            print("Processing 1000 records...")
+            print("Import completed!")
+      restartPolicy: Never

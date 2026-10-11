@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-backup
+  namespace: lab-job-cronjob
+spec:
+  schedule: "0 2 * * *"  # 2 AM daily
+  timeZone: Europe/Paris
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: python:3.13-slim
+            command: ["python", "-c", "print('Backup completed')"]
+          restartPolicy: Never
